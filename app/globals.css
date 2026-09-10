@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../node_modules/remixicon/fonts/remixicon.css";
 
 :root {
   --background: #ffffff;
@@ -23,4 +24,14 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-33.333%);
+  }
 }
