@@ -1,3 +1,6 @@
+"use client";
+import { useState } from "react";
+
 import Announcement from "./components/Announcement";
 import Navbar from "./components/Navbar";
 import PopularDestinations from "./components/PopularDestinations";
@@ -6,6 +9,27 @@ import GuestReviews from "./components/GuestReviews";
 import Footer from "./components/Footer";
 
 export default function Home() {
+  const [location, setLocation] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState("");
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const calculateNights = () => {
+    if (!checkIn || !checkOut) return 0;
+
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+
+    const difference = end.getTime() - start.getTime();
+    const nights = Math.ceil(difference / (1000 * 60 * 60 * 24));
+
+    return nights > 0 ? nights : 0;
+  };
+
+  const nights = calculateNights();
+
   return (
     <main className="min-h-screen bg-white">
       <div className="sticky top-0 z-50">
@@ -48,6 +72,8 @@ export default function Home() {
 
                 <input
                   type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
                   placeholder="Where are you staying?"
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-blue-600"
                 />
@@ -61,6 +87,9 @@ export default function Home() {
 
                 <input
                   type="date"
+                  value={checkIn}
+                  min={today}
+                  onChange={(e) => setCheckIn(e.target.value)}
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-blue-600"
                 />
               </div>
@@ -73,6 +102,9 @@ export default function Home() {
 
                 <input
                   type="date"
+                  value={checkOut}
+                  min={checkIn || today}
+                  onChange={(e) => setCheckOut(e.target.value)}
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-blue-600"
                 />
               </div>
@@ -86,6 +118,8 @@ export default function Home() {
                 <input
                   type="number"
                   min="1"
+                  value={guests}
+                  onChange={(e) => setGuests(e.target.value)}
                   placeholder="Number of guests"
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-blue-600"
                 />
@@ -96,6 +130,31 @@ export default function Home() {
             <div className="mt-4 flex justify-end">
               <button
                 type="button"
+                onClick={() => {
+                  if (!location || !checkIn || !checkOut || !guests) {
+                    alert("Please fill in all search fields.");
+                    return;
+                  }
+
+                  if (new Date(checkOut) <= new Date(checkIn)) {
+                    alert("Check-out date must be after check-in date.");
+                    return;
+                  }
+
+                  if (Number(guests) < 1) {
+                    alert("Please enter at least 1 guest.");
+                    return;
+                  }
+
+                  const searchParams = new URLSearchParams({
+                    location,
+                    checkIn,
+                    checkOut,
+                    guests,
+                  });
+
+                  window.location.href = `/apartments?${searchParams.toString()}`;
+                }}
                 className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700"
               >
                 <i className="ri-search-line text-lg"></i>
